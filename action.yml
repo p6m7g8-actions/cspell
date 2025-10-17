@@ -8,6 +8,12 @@ runs:
     - name: Checkout code
       uses: actions/checkout@v5.0.0
 
+    - name: "Generate cspell.json from VSCode settings"
+      shell: bash
+      run: |
+        mkdir -p .github/tmp
+        jq '{ version: "0.2", words: .["cSpell.words"] }' .vscode/settings.json > .github/tmp/cspell.json
+
     - name: "Spellcheck"
       uses: streetsidesoftware/cspell-action@v7.2.0
       with:
@@ -18,5 +24,6 @@ runs:
         suggestions: false
         verbose: true
         check_dot_files: explicit
-        use_cspell_files: false
+        use_cspell_files: true
+        config: .github/tmp/cspell.json
         report: all
