@@ -1,0 +1,12 @@
+name: "P6 GHA: Shellcheck"
+description: "P6 GHA: Shellcheck"
+author: "Philip M. Gollucci"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v5.0.0
+
+    - name: "Shellcheck"
+      uses: streetsidesoftware/cspell-action@v7.2.0
