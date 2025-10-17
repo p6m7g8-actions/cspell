@@ -1,5 +1,5 @@
-name: "P6 GHA: Shellcheck"
-description: "P6 GHA: Shellcheck"
+name: "P6 GHA: Spellcheck"
+description: "P6 GHA: Spellcheck"
 author: "Philip M. Gollucci"
 
 runs:
@@ -8,7 +8,7 @@ runs:
     - name: Checkout code
       uses: actions/checkout@v5.0.0
 
-    - name: "Shellcheck"
+    - name: "Spellcheck"
       uses: streetsidesoftware/cspell-action@v7.2.0
       with:
         incremental_files_only: false

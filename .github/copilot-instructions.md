@@ -22,7 +22,7 @@ This repository defines a **composite GitHub Action** that **builds and tests `p
 
 ## 2) Build & Validation Instructions
 
-> These steps reflect the exact sequence defined in `action.yml`. They are safe defaults for local repros and CI.
+> These steps reflect the exact sequence defined in `action.yml`. They are safe defaults for local repos and CI.
 
 ### Bootstrap
 Always ensure a clean Ubuntu shell with `apt` available. Then:
