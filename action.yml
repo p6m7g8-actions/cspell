@@ -10,3 +10,13 @@ runs:
 
     - name: "Shellcheck"
       uses: streetsidesoftware/cspell-action@v7.2.0
+      with:
+        incremental_files_only: false
+        inline: warning
+        treat_flagged_words_as_errors: false
+        strict: true
+        suggestions: false
+        verbose: true
+        check_dot_files: explicit
+        use_cspell_files: false
+        report: all
