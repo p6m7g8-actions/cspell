@@ -1,13 +1,10 @@
 name: "CSpell"
 
 on:
-  pull_request:
-    branches:
-      - main
+  pull_request: {}
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   cspell:
