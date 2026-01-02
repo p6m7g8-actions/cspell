@@ -6,7 +6,7 @@ runs:
   using: "composite"
   steps:
     - name: Checkout code
-      uses: actions/checkout@v5.0.0
+      uses: actions/checkout@v6.0.1
 
     - name: "Generate cspell.json from VSCode settings"
       shell: bash
@@ -15,7 +15,7 @@ runs:
         jq '{ version: "0.2", words: .["cSpell.words"] }' .vscode/settings.json > .github/tmp/cspell.json
 
     - name: "Spellcheck"
-      uses: streetsidesoftware/cspell-action@v7.2.0
+      uses: streetsidesoftware/cspell-action@v8.1.1
       with:
         incremental_files_only: false
         inline: warning
