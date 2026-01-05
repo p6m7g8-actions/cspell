@@ -12,7 +12,7 @@ runs:
       shell: bash
       run: |
         mkdir -p .github/tmp
-        jq '{ version: "0.2", words: .["cSpell.words"] }' .vscode/settings.json > .github/tmp/cspell.json
+        jq '{ version: "0.2", words: .["cSpell.words"] }' .vscode/settings.json > .github/tmp/cspell.json || touch .github/tmp/cspell.json
 
     - name: "Spellcheck"
       uses: streetsidesoftware/cspell-action@v7.2.0
