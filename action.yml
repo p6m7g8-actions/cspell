@@ -2,6 +2,12 @@ name: "P6 GHA: Spellcheck"
 description: "P6 GHA: Spellcheck"
 author: "Philip M. Gollucci"
 
+inputs:
+  cspell:
+    description: "Run cspell (true/false)"
+    required: false
+    default: "true"
+
 runs:
   using: "composite"
   steps:
@@ -9,12 +15,59 @@ runs:
       uses: p6m7g8-actions/checkout@main
 
     - name: "Generate cspell.json from VSCode settings"
+      if: ${{ inputs.cspell == 'true' }}
       shell: bash
       run: |
-        mkdir -p .github/tmp
-        jq '{ version: "0.2", words: .["cSpell.words"] }' .vscode/settings.json > .github/tmp/cspell.json || touch .github/tmp/cspell.json
+        set -uo pipefail
+
+        settings_file=".vscode/settings.json"
+        config_dir=".github/tmp"
+        config_file="${config_dir}/cspell.json"
+        # A valid, parseable minimal config. An empty file is NOT a cspell
+        # config, so it must never be what we leave behind.
+        minimal='{"version":"0.2","words":[]}'
+        filter='{ version: "0.2", words: (.["cSpell.words"] // []) }'
+
+        mkdir -p "${config_dir}"
+
+        candidate="$(mktemp)"
+        stripped="$(mktemp)"
+        trap 'rm -f "${candidate}" "${stripped}"' EXIT
+
+        generated="false"
+        if [[ -f "${settings_file}" ]]; then
+          if jq "${filter}" "${settings_file}" >"${candidate}" 2>/dev/null; then
+            generated="true"
+          else
+            # VS Code permits JSONC (// and /* */ comments, trailing commas);
+            # jq does not. Strip both, preserving string literals, and retry.
+            perl -0777 -pe '
+              s{("(?:\\.|[^"\\])*")|//[^\n]*|/\*.*?\*/}{defined $1 ? $1 : ""}gse;
+              s/,(\s*[}\]])/$1/g;
+            ' "${settings_file}" >"${stripped}" 2>/dev/null || true
+            if jq "${filter}" "${stripped}" >"${candidate}" 2>/dev/null; then
+              generated="true"
+              echo "Parsed ${settings_file} as JSONC (stripped comments/trailing commas)."
+            else
+              echo "::warning::Could not parse ${settings_file}; using minimal cspell config."
+            fi
+          fi
+        else
+          echo "No ${settings_file}; using minimal cspell config."
+        fi
+
+        if [[ "${generated}" == "true" ]] && [[ -s "${candidate}" ]] &&
+          jq -e . "${candidate}" >/dev/null 2>&1; then
+          cp "${candidate}" "${config_file}"
+        else
+          printf '%s\n' "${minimal}" >"${config_file}"
+        fi
+
+        echo "Using cspell config ${config_file}:"
+        cat "${config_file}"
 
     - name: "Spellcheck"
+      if: ${{ inputs.cspell == 'true' }}
       uses: streetsidesoftware/cspell-action@v8.3.0
       with:
         incremental_files_only: false
